@@ -1,0 +1,10 @@
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\bin\Release\__configuration.cfg
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\bin\Release\__messages.json
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\bin\Release\Server_Queue.net.dll
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\bin\Release\Server_Queue.net.pdb
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\bin\Release\Newtonsoft.Json.dll
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\bin\Release\Server.CitizenFX.Core.dll
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\obj\Release\Server_Queue.csproj.CoreCompileInputs.cache
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\obj\Release\Server_Queue.csproj.CopyComplete
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\obj\Release\Server_Queue.net.dll
+D:\GTARPServer\C#Code\FiveM_Queue\FiveM_Queue\Server_Queue\obj\Release\Server_Queue.net.pdb

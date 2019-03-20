@@ -50,6 +50,7 @@ namespace Server
         internal static bool bannedReady = false;
         internal static bool reservedReady = false;
         internal static bool priorityReady = false;
+        private bool SQLReady = false;
 
         public Server_Queue()
         {
@@ -68,6 +69,18 @@ namespace Server
             StopHardcap();
             Task.Run(QueueCycle);
             serverQueueReady = true;
+            EventHandlers["RevoSQLReady"]       += new Action<string, bool>(RevoSQLReady);
+            EventHandlers["ResendRevoSQLReady"] += new Action<string, bool>(ResendRevoSQLReady);
+        }
+
+        private void RevoSQLReady(string stuff, bool thing)
+        {
+            SQLReady = true;
+        }
+
+        private void ResendRevoSQLReady(string stuff, bool thing) 
+        {
+            SQLReady = true;
         }
 
         private void LoadConfigs()
@@ -132,7 +145,7 @@ namespace Server
 
         private bool IsEverythingReady()
         {
-            if (serverQueueReady && bannedReady && priorityReady && reservedReady)
+            if (serverQueueReady && bannedReady && priorityReady && reservedReady && SQLReady)
             { return true; }
             return false;
         }
@@ -984,6 +997,8 @@ namespace Server
                 }
                 API.RegisterCommand("q_addpriority", new Action<int, List<object>, string>(Add), true);
                 API.RegisterCommand("q_removepriority", new Action<int, List<object>, string>(Remove), true);
+                EventHandlers["q_addpriority"] += new Action<string, int>(AddPriorityEvent);
+                EventHandlers["q_removepriority"] += new Action<string>(RemovePriorityEvent);
                 Server_Queue.priorityReady = true;
             }
             catch (Exception)
@@ -1029,6 +1044,65 @@ namespace Server
             catch (Exception)
             {
                 Debug.WriteLine($"[{Server_Queue.resourceName} - ERROR] - Server_Priority.Add()");
+            }
+            return;
+        }
+        public void AddPriorityEvent(string identifier, int priority)
+        {
+            try
+            {
+                if (priority <= 0 || priority > 100) { priority = 100; }
+                Player player = Players.FirstOrDefault(k => k.Identifiers["license"] == identifier || k.Identifiers["steam"] == identifier);
+                if (player != null)
+                {
+                    PriorityAccount account = new PriorityAccount(player.Identifiers["license"], player.Identifiers["steam"], priority);
+                    accounts.Add(account);
+                    if (!Server_Queue.priority.TryAdd(account.License, priority))
+                    {
+                        Server_Queue.priority.TryGetValue(account.License, out int oldPriority);
+                        Server_Queue.priority.TryUpdate(account.License, priority, oldPriority);
+                    }
+                    string path = $"{directory}/{account.License}-{account.Steam}.json";
+                    File.WriteAllText(path, JsonConvert.SerializeObject(account));
+                    Debug.WriteLine($"{identifier} was granted priority.");
+                }
+                else
+                {
+                    Debug.WriteLine($"No account found in session for {identifier}, adding to offline priority list");
+                    newwhitelist.Add(new PriorityAccount(identifier, identifier, priority));
+                    string path = $"{Server_Queue.resourcePath}/JSON/offlinepriority.json";
+                    File.WriteAllText(path, JsonConvert.SerializeObject(newwhitelist));
+                }
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine($"[{Server_Queue.resourceName} - ERROR] - Server_Priority.Add()");
+            }
+            return;
+        }
+        public void RemovePriorityEvent(string identifier)
+        {
+            try
+            {
+
+                newwhitelist.Where(k => k.License == identifier || k.Steam == identifier).ToList().ForEach(j =>
+                {
+                    newwhitelist.Remove(j);
+                });
+                string path = $"{Server_Queue.resourcePath}/JSON/offlinepriority.json";
+                File.WriteAllText(path, JsonConvert.SerializeObject(newwhitelist));
+                accounts.Where(k => k.License == identifier || k.Steam == identifier).ToList().ForEach(j =>
+                {
+                    path = $"{directory}/{j.License}-{j.Steam}.json";
+                    File.Delete(path);
+                    accounts.Remove(j);
+                });
+                Server_Queue.priority.TryRemove(identifier, out int oldPriority);
+                Debug.WriteLine($"{identifier} was removed from priority list.");
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine($"[{Server_Queue.resourceName} - ERROR] - Server_Priority.Remove()");
             }
             return;
         }
