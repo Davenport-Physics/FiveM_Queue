@@ -6,7 +6,9 @@ ui_page 'NUI/index.html'
 
 server_scripts {
 "Newtonsoft.Json.dll",
-"Server_Queue.net.dll"
+"Server_Queue.net.dll",
+"s_fivemqueue.lua",
+"@mysql-async/lib/MySQL.lua"
 }
 
 client_scripts {
