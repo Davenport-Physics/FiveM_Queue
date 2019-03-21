@@ -1,5 +1,9 @@
 # FiveM Queue
-A Queue system for FiveM FX Servers
+A Queue system for FiveM FX Servers, modified for <a href="https://forums.rmog.us/">Revolution Life RP</a>
+
+<b>Modifications</b>
+- Backend integration with Revolution Life's in game database.
+- Server Events for both AddPriority and RemovePriority.
 
 <b>Installation Instructions</b>
 - Download the latest release <a href="https://github.com/anderscripts/FiveM_Queue/releases/download/v1.1.0/fivemqueue.rar">here</a>
