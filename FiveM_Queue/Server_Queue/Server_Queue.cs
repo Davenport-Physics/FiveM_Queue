@@ -80,7 +80,11 @@ namespace Server
 
         private void ResendRevoSQLReady(string stuff, bool thing) 
         {
-            SQLReady = true;
+            if (!SQLReady) {
+                API.SetConvar("sv_hostname", APT.GetConvar("hostname_const", "Revolution Life RP"));
+                SQLReady = true;
+            }
+            
         }
 
         private void LoadConfigs()
@@ -899,6 +903,10 @@ namespace Server
         {
             while (true)
             {
+                if (!SQLReady) {
+                    await Delay(100);
+                    continue;
+                }
                 try
                 {
                     inPriorityQueue = PriorityQueueCount();
