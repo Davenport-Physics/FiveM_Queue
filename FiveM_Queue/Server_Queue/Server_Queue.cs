@@ -81,7 +81,7 @@ namespace Server
         private void ResendRevoSQLReady(string stuff, bool thing) 
         {
             if (!SQLReady) {
-                API.SetConvar("sv_hostname", APT.GetConvar("hostname_const", "Revolution Life RP"));
+                API.SetConvar("sv_hostname", API.GetConvar("hostname_const", "Revolution Life RP"));
                 SQLReady = true;
             }
             
@@ -89,6 +89,7 @@ namespace Server
 
         private void LoadConfigs()
         {
+            API.SetConvar("sv_hostname", API.GetConvar("hostname_const", "Revolution Life RP"));
             API.ExecuteCommand($"exec {resourcePath}/__configuration.cfg");
             if (hostName == string.Empty) { hostName = API.GetConvar("sv_hostname", string.Empty); }
             if (!File.Exists($"{resourcePath}/__messages.json")) { CreateMessagesJSON($"{resourcePath}/__messages.json"); }
