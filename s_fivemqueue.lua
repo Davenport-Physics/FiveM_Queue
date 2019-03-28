@@ -55,7 +55,7 @@ end
 local function playerConnectingStart(playerName, kickReason, defer)
 
     local steam_id = getSteamID(source)
-    if not SQLinit then
+    if not SQLinit or GetResourceStatus("mysql-async") == "missing" then
 
         kickReason("SQL is not ready Give it a minute")
         CancelEvent()

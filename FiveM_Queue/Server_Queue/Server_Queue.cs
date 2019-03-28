@@ -768,6 +768,11 @@ namespace Server
 
         private async void PlayerConnecting([FromSource]Player source, string playerName, dynamic denyWithReason, dynamic deferrals)
         {
+            if (API.GetResourceState("mysql-async") == "missing")
+            {
+                denyWithReason("MySQL is not ready yet.");
+                API.CancelEvent();
+            }
             try
             {
                 deferrals.defer();
