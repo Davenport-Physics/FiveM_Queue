@@ -772,6 +772,7 @@ namespace Server
             {
                 denyWithReason("MySQL is not ready yet.");
                 API.CancelEvent();
+                return;
             }
             try
             {
