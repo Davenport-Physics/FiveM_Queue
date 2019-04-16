@@ -1,4 +1,6 @@
-local SQLinit = false
+local SQLinit             = false
+local has_whitelist_queue = false
+local only_whistlist      = false
 
 AddEventHandler("RevoSQLReady", function()
     SQLinit = true
@@ -9,27 +11,46 @@ AddEventHandler("ResendRevoSQLReady", function()
 end)
 
 
+local function HandleWhitelistOnlyServer(whitelisted, kickReason)
 
-local function GeneratePrioList(source, steam_id)
+    if only_whistlist and not whitelisted then
+
+        kickReason("You must be whitelisted to play on this server.")
+        CancelEvent()
+
+    end
+
+end
+
+local function AddOrRemoveFromPrio(steam_hex, rows, kickReason)
+
+    local whitelisted = false
+    if #rows >= 1 then
+
+        if rows[1].priority ~= 0 then
+            TriggerEvent("q_addpriority", steam_hex, rows[1].priority)
+        elseif rows[1].whitelist ~= 0 and has_whitelist_queue then
+            whitelisted = true
+            TriggerEvent("q_addpriority", steam_hex, 99)
+        end
+
+    else
+        TriggerEvent("q_removepriority", steam_hex)
+    end
+    HandleWhitelistOnlyServer(whitelisted, kickReason)
+
+end
+
+
+local function GeneratePrioList(source, steam_id, kickReason)
 
     local steam_hex = string.format("%x", steam_id)
     Citizen.CreateThread(function()
         Citizen.Wait(5)
         MySQL.Async.fetchAll("SELECT * FROM users WHERE steamid=@steam", {['@steam'] = steam_id}, 
         function(rows)
-            local prio = false
-            local whitelist = false
 
-            if #rows >= 1 then
-                if rows[1].whitelist ~= 0 then
-                    whitelist = true
-                end
-                if rows[1].priority ~= 0 then
-                    TriggerEvent("q_addpriority", steam_hex, rows[1].priority)
-                end
-            else
-                TriggerEvent("q_removepriority", steam_hex)
-            end
+            AddOrRemoveFromPrio(steam_hex, rows, kickReason)
 
         end)
     end)
@@ -71,7 +92,7 @@ local function playerConnectingStart(playerName, kickReason, defer)
 
     end
 
-    GeneratePrioList(source, steam_id)
+    GeneratePrioList(source, steam_id, kickReason)
 
 end
 
